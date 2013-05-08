@@ -1,0 +1,18 @@
+#!/bin/bash
+set -e
+
+juju-log "Upgrading TTRSS"
+
+# Stop Apache for upgrade
+hooks/stop
+
+mv /var/www/tt-rss /tmp/tt-rss-old
+
+# Upgrade
+hooks/install
+
+# Migrate old config
+mv /tmp/tt-rss-old/config.php /var/www/tt-rss/config.php
+
+# Start Apache
+hooks/config-changed

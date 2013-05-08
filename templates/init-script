@@ -1,0 +1,66 @@
+#! /bin/sh
+### BEGIN INIT INFO
+# Provides:          tt-rss-daemon
+# Required-Start:
+# Required-Stop:
+# Default-Start:
+# Default-Stop:      6
+# Short-Description: Start the tt-rss update daemon.
+# Description:
+### END INIT INFO
+
+PATH=/sbin:/usr/sbin:/bin:/usr/bin
+
+. /lib/lsb/init-functions
+
+get_pid() {
+  PID=`ps ax | grep php | grep update-daemon2.php | cut -d" " -f2`
+}
+
+start_daemon() {
+  start-stop-daemon -b --start -c www-data -g www-data --quiet --oknodo \
+    --pidfile /var/run/tt-rss-daemon.pid \
+    --exec /var/www/tt-rss/update_daemon2.php -- \
+    --log /var/log/tt-rss/update-daemon.log \
+    --interval 300 --quiet
+}
+
+case "$1" in
+  start)
+    echo -n "Starting tt-rss-daemon..."
+    if start_daemon; then
+      echo "OK"
+    else
+      echo "FAIL"
+    fi
+    ;;
+  restart)
+    echo -n "Stopping tt-rss-daemon..."
+    if get_pid; then
+      kill -9 $PID
+      echo "OK"
+    else
+      echo "FAIL"
+    exit 1
+    fi
+    echo -n "Starting tt-rss-daemon..."
+    if start_daemon; then
+      echo "OK"
+    else
+      echo "FAIL"
+    fi
+    ;;
+  stop)
+    echo -n "Stopping tt-rss-daemon..."
+    if get_pid; then
+      kill -9 $PID
+      echo "OK"
+    else
+      echo "FAIL"
+    fi
+    ;;
+  *)
+    echo "Usage: $0 start|stop|restart" >&2
+    exit 3
+    ;;
+esac

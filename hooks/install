@@ -1,0 +1,52 @@
+#!/bin/bash
+
+set -eux # -x for verbose logging to juju debug-log
+url=`config-get url`
+
+# Install dependencies
+juju-log "Installing apache2 and php via apt-get"
+
+add-apt-repository -y ppa:charmers/charm-helpers
+
+apt-get update && apt-get -y upgrade
+
+apt-get -y install apache2 \
+        php5-gd \
+        libapache2-mod-php5 \
+        php5-cgi \
+        php-apc \
+        php5-mysql \
+		php5-curl \
+        mysql-client-core-5.5 \
+        charm-helper-sh
+
+a2enmod php5
+
+/etc/init.d/apache2 restart
+
+# Download and setup TTRSS
+juju-log "Downloading tt-rss tarball"
+
+cd /var/www && wget -O- $url | tar xzf -
+
+mv Tiny-Tiny-RSS* tt-rss
+
+cp tt-rss/config.php-dist tt-rss/config.php
+
+chown -R www-data: tt-rss
+chmod -R 777 tt-rss/cache/images
+chmod -R 777 tt-rss/cache/export
+chmod -R 777 tt-rss/cache/js
+chmod -R 777 tt-rss/feed-icons
+chmod -R 777 tt-rss/lock
+
+cd -
+
+service apache2 start || :
+service apache2 reload
+
+cp templates/init-script /etc/init.d/tt-rss-daemon
+
+chmod 755 /etc/init.d/tt-rss-daemon
+
+open-port 80/tcp

@@ -1,0 +1,7 @@
+#!/bin/sh
+
+port=`config-get port`
+
+pub_addr=`unit-get private-address`
+
+relation-set port=$port hostname=$pub_addr

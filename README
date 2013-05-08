@@ -1,0 +1,46 @@
+Tiny-Tiny RSS Charm
+
+Overview
+--------
+
+This charm provides Tiny-Tiny RSS (http://tt-rss.org/redmine/projects/tt-rss/wiki). Taken from the main project site:
+
+Tiny Tiny RSS is an open source web-based news feed (RSS/Atom) reader and aggregator, designed to allow you to read news from any location, while feeling as close to a real desktop application as possible.
+
+Usage
+-----
+
+Instructions on using the charm:
+
+    juju deploy tt-rss
+    juju deploy mysql
+    
+    juju add-relation tt-rss mysql
+    
+    juju expose tt-rss
+
+You can then browse to http://ip-address/tt-rss to configure the service. The default username and password are "admin/password". 
+
+Configuration
+-------------
+
+Currently, only two configuration options are available: FQDN and URL. The FQDN is used within the application itself and the URL parameter dictates where, on deployment, the tt-rss source should be downloaded from. The options are detailed below:
+
+fqdn:
+	type: string
+	default: localhost
+	description: FQDN of the server running tt-rss
+url:
+    type: string
+    default: https://github.com/gothfox/Tiny-Tiny-RSS/archive/1.7.8.tar.gz
+    description: URL to download the tt-rss tarball
+
+Contact Information
+-------------------
+
+Please feel free to contact with any feature requests, improvements, or bugs you may think of or encounter.
+
+Author: NextRevision (notarobot@nextrevision.net)
+Report bugs at: http://bugs.launchpad.net/charms/+source/tt-rss
+Location: http://jujucharms.com/charms/precise/tt-rss
+

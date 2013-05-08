@@ -1,0 +1,12 @@
+#!/bin/bash
+
+set -e
+
+fqdn=`config-get fqdn`
+
+juju-log "Changing config.php"
+sed -i "s|define('SELF_URL_PATH', .*);|define('SELF_URL_PATH', 'http://$fqdn/tt-rss');|g" /var/www/tt-rss/config.php
+
+#juju-log "Reloading Apache"
+service apache2 start || :
+service apache2 reload

@@ -1,0 +1,4 @@
+#!/bin/bash
+set -eu
+juju-log "Starting Apache for TTRSS"
+service apache2 start || service apache2 restart

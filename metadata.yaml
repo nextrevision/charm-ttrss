@@ -1,0 +1,12 @@
+name: tt-rss
+summary: "Tiny-Tiny RSS"
+maintainer: NextRevision <notarobot@nextrevision.net>
+description: Provides the tt-rss Server
+categories:
+  - misc
+requires:
+  db:
+    interface: mysql
+provides:
+  website:
+      interface: http

@@ -1,0 +1,9 @@
+options:
+  fqdn:
+    type: string
+    default: localhost
+    description: fqdn of the server
+  url:
+    type: string
+    default: https://github.com/gothfox/Tiny-Tiny-RSS/archive/1.7.7.tar.gz
+    description: url for tt-rss tarball

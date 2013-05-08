@@ -1,0 +1,4 @@
+#!/bin/bash
+set -eu
+juju-log "Stopping Apache for TTRSS"
+service apache2 stop || :

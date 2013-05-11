@@ -2,8 +2,12 @@ options:
   fqdn:
     type: string
     default: localhost
-    description: fqdn of the server
-  url:
-    type: string
-    default: https://github.com/gothfox/Tiny-Tiny-RSS/archive/1.7.7.tar.gz
-    description: url for tt-rss tarball
+    description: FQDN of the server
+  update-tasks:
+    type: int
+    default: 2
+    description: number of feed update tasks to spawn
+  update-interval:
+    type: int
+    default: 300
+    description: frequency to check for feed updates

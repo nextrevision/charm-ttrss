@@ -2,11 +2,29 @@
 
 set -e
 
+# Static variables
+CONFIG_FILE=/var/www/tt-rss/config.php
+INIT_SCRIPT=/etc/init/tt-rss-daemon.conf
+
+juju-log "Retrieving user specified configuration parameters"
+
 fqdn=`config-get fqdn`
+interval=`config-get update-interval`
+tasks=`config-get update-tasks`
 
-juju-log "Changing config.php"
-sed -i "s|define('SELF_URL_PATH', .*);|define('SELF_URL_PATH', 'http://$fqdn/tt-rss');|g" /var/www/tt-rss/config.php
+juju-log "Updating config.php"
 
-#juju-log "Reloading Apache"
-service apache2 start || :
-service apache2 reload
+sed -i "s|define('SELF_URL_PATH', .*);|define('SELF_URL_PATH', 'http://$fqdn/tt-rss');|g" ${CONFIG_FILE}
+
+juju-log "Updating init script"
+
+sed -i "s/--tasks [0-9]*/--tasks $tasks/g" ${INIT_SCRIPT}
+sed -i "s/--interval [0-9]*/--interval $interval/g" ${INIT_SCRIPT}
+
+juju-log "Stopping services"
+
+hooks/stop
+
+juju-log "Starting services"
+
+hooks/start

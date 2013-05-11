@@ -1,0 +1,15 @@
+# /etc/init/tt-rss-daemon.conf
+
+description "Updater daemon to automatically retrieve new feed content"
+author      "NextRevision"
+
+# Start once the system and network is up
+start on (local-filesystems and net-device-up IFACE!=lo)
+
+# Stop when the system is being halted
+stop on shutdown
+
+# Execute and daemonize the update script
+script
+        exec start-stop-daemon -S -c www-data:www-data -x /var/www/tt-rss/update_daemon2.php -- --log /var/log/tt-rss/update-daemon.log --interval 60 --tasks 2
+end script

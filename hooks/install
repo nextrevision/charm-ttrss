@@ -1,10 +1,12 @@
 #!/bin/bash
 
-set -eux # -x for verbose logging to juju debug-log
-url=`config-get url`
+set -e #ux # -x for verbose logging to juju debug-log
+
+# Manually set source, update can be performed via the web interface
+source=https://github.com/gothfox/Tiny-Tiny-RSS/archive/1.7.8.tar.gz
 
 # Install dependencies
-juju-log "Installing apache2 and php via apt-get"
+juju-log "Installing required dependencies"
 
 add-apt-repository -y ppa:charmers/charm-helpers
 
@@ -18,7 +20,10 @@ apt-get -y install apache2 \
         php5-mysql \
 		php5-curl \
         mysql-client-core-5.5 \
-        charm-helper-sh
+        charm-helper-sh \
+		php-gettext \
+		php5 \
+		php5-cli
 
 a2enmod php5
 
@@ -27,12 +32,16 @@ a2enmod php5
 # Download and setup TTRSS
 juju-log "Downloading tt-rss tarball"
 
-cd /var/www && wget -O- $url | tar xzf -
+cd /var/www && wget -q -O- $source | tar xzf -
+
+juju-log "Unpacking and performing inital configuration"
 
 mv Tiny-Tiny-RSS* tt-rss
 
+# Create the initial, default configuration file
 cp tt-rss/config.php-dist tt-rss/config.php
 
+# Assign permissions
 chown -R www-data: tt-rss
 chmod -R 777 tt-rss/cache/images
 chmod -R 777 tt-rss/cache/export
@@ -40,13 +49,20 @@ chmod -R 777 tt-rss/cache/js
 chmod -R 777 tt-rss/feed-icons
 chmod -R 777 tt-rss/lock
 
+# Create log directory for feed update daemon
+if [ ! -d /var/log/tt-rss ]; then
+	mkdir /var/log/tt-rss
+fi
+chown -R www-data: /var/log/tt-rss
+
 cd -
+
+juju-log "Restarting Apache"
 
 service apache2 start || :
 service apache2 reload
 
-cp templates/init-script /etc/init.d/tt-rss-daemon
+juju-log "Creating upstart script for feed update daemon"
 
-chmod 755 /etc/init.d/tt-rss-daemon
-
-open-port 80/tcp
+cp files/upstart-script /etc/init/tt-rss-daemon.conf
+chmod 644 /etc/init/tt-rss-daemon.conf

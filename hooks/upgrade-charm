@@ -1,18 +1,28 @@
 #!/bin/bash
+
 set -e
 
-juju-log "Upgrading TTRSS"
+timestamp=`date +%s`
 
-# Stop Apache for upgrade
+juju-log "Upgrading tt-rss"
+
+juju-log "Stopping apache and feed update daemon"
+
 hooks/stop
 
-mv /var/www/tt-rss /tmp/tt-rss-old
+juju-log "Moving old tt-rss installation to /tmp/tt-rss-old"
 
-# Upgrade
+mv /var/www/tt-rss /tmp/tt-rss-${timestamp}
+
+juju-log "Performing upgrade"
+
 hooks/install
 
-# Migrate old config
-mv /tmp/tt-rss-old/config.php /var/www/tt-rss/config.php
+juju-log "Migration old config settings to new installation"
 
-# Start Apache
+cp /tmp/tt-rss-${timestamp}/config.php /var/www/tt-rss/config.php
+chown www-data: /var/www/tt-rss/config.php
+
+juju-log "Updating and starting services"
+
 hooks/config-changed

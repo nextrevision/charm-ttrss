@@ -1,4 +1,12 @@
 #!/bin/bash
-set -eu
-juju-log "Starting Apache for TTRSS"
+set -e #u
+
+database=`relation-get database`
+
+juju-log "Starting Apache for tt-rss"
+
 service apache2 start || service apache2 restart
+
+juju-log "Starting feed update daemon"
+
+start tt-rss-daemon || :

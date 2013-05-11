@@ -1,40 +1,49 @@
 #!/bin/bash
 
-set -eu # -x for verbose logging to juju debug-log
+set -e #u # -x for verbose logging to juju debug-log
+
+# Set static variables
+CONFIG_FILE=/var/www/tt-rss/config.php
 
 # Get DB details
+juju-log "Getting database connection details"
+
 database=`relation-get database`
 if [ -z "${database}" ]; then
     exit 0
 fi
-
-config_file=/var/www/tt-rss/config.php
 
 user=`relation-get user`
 password=`relation-get password`
 host=`relation-get private-address`
 database=`relation-get database`
 
-# Check to see if DB is initialized and setup the config file
-juju-log "Checking DB parameters"
-
 function update_config() {
-        sed -i "s/define('DB_TYPE', .*);/define('DB_TYPE', 'mysql');/g" $config_file
-        sed -i "s/define('DB_USER', .*);/define('DB_USER', '$user');/g" $config_file
-        sed -i "s/define('DB_NAME', .*);/define('DB_NAME', '$database');/g" $config_file
-        sed -i "s/define('DB_PASS', .*);/define('DB_PASS', '$password');/g" $config_file
-        sed -i "s/define('DB_PORT', .*);/define('DB_PORT', '');/g" $config_file
-        sed -i "s/define('DB_HOST', .*);/define('DB_HOST', '$host');/g" $config_file
+        sed -i "s/define('DB_TYPE', .*);/define('DB_TYPE', 'mysql');/g" $CONFIG_FILE
+        sed -i "s/define('DB_USER', .*);/define('DB_USER', '$user');/g" $CONFIG_FILE
+        sed -i "s/define('DB_NAME', .*);/define('DB_NAME', '$database');/g" $CONFIG_FILE
+        sed -i "s/define('DB_PASS', .*);/define('DB_PASS', '$password');/g" $CONFIG_FILE
+        sed -i "s/define('DB_PORT', .*);/define('DB_PORT', '');/g" $CONFIG_FILE
+        sed -i "s/define('DB_HOST', .*);/define('DB_HOST', '$host');/g" $CONFIG_FILE
 }
+
+juju-log "Checking to see if the DB has been created and populated"
 
 if mysql -u $user -p$password -h $host -e "SELECT schema_version FROM ttrss_version;" $database; then
         # Update config settings
+        juju-log "Database populated, updating config file"
         update_config
 else
         # Copy default config file and change values
-        update_config
+        juju-log "Database not populated, importing schema and updating config file"
         mysql -u $user -p$password -h $host $database < /var/www/tt-rss/schema/ttrss_schema_mysql.sql
+        update_config
 fi
 
-update-rc.d tt-rss-daemon defaults
-/etc/init.d/tt-rss-daemon start
+juju-log "Opening port 80"
+
+open-port 80
+
+juju-log "Starting tt-rss feed update daemon"
+
+start tt-rss-daemon

@@ -12,8 +12,8 @@ Usage
 
 Instructions on using the charm:
 
-    juju deploy tt-rss
     juju deploy mysql
+    juju deploy tt-rss
     
     juju add-relation tt-rss mysql
     
@@ -24,16 +24,20 @@ You can then browse to http://ip-address/tt-rss to configure the service. The de
 Configuration
 -------------
 
-Currently, only two configuration options are available: FQDN and URL. The FQDN is used within the application itself and the URL parameter dictates where, on deployment, the tt-rss source should be downloaded from. The options are detailed below:
+Currently, there are three variables avialable: fqdn, update-tasks, and update-interval. The 'fqdn' variable should be set to the FQDN used by the end user to access the tt-rss instance. The 'update-interval' and 'update-tasks' correspond to the feed update daemon running in the background. Set the interval to how often, in seconds, you would like your feeds to be updated and the tasks to how many spawned instances of the updater you desire (i.e. more feeds might require more tasks). Below is the relevant config section: 
 
 fqdn:
-	type: string
-	default: localhost
-	description: FQDN of the server running tt-rss
-url:
-    type: string
-    default: https://github.com/gothfox/Tiny-Tiny-RSS/archive/1.7.8.tar.gz
-    description: URL to download the tt-rss tarball
+  type: string
+  default: localhost
+  description: FQDN of the server
+update-tasks:
+  type: int
+  default: 2
+  description: number of feed update tasks to spawn
+update-interval:
+  type: int
+  default: 300
+  description: frequency to check for feed updates
 
 Contact Information
 -------------------

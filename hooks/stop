@@ -1,4 +1,10 @@
 #!/bin/bash
-set -eu
-juju-log "Stopping Apache for TTRSS"
+set -e #u
+
+juju-log "Stopping Apache for tt-rss"
+
 service apache2 stop || :
+
+juju-log "Stopping feed update daemon"
+
+stop tt-rss-daemon || :

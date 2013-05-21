@@ -3,7 +3,7 @@
 set -e #ux # -x for verbose logging to juju debug-log
 
 # Manually set source, update can be performed via the web interface
-source=https://github.com/gothfox/Tiny-Tiny-RSS/archive/1.7.8.tar.gz
+source=https://github.com/gothfox/Tiny-Tiny-RSS/archive/1.7.9.tar.gz
 
 # Install dependencies
 juju-log "Installing required dependencies"
@@ -13,17 +13,17 @@ add-apt-repository -y ppa:charmers/charm-helpers
 apt-get update && apt-get -y upgrade
 
 apt-get -y install apache2 \
-        php5-gd \
-        libapache2-mod-php5 \
-        php5-cgi \
-        php-apc \
-        php5-mysql \
-		php5-curl \
-        mysql-client-core-5.5 \
-        charm-helper-sh \
-		php-gettext \
-		php5 \
-		php5-cli
+  php5-gd \
+  libapache2-mod-php5 \
+  php5-cgi \
+  php-apc \
+  php5-mysql \
+  php5-curl \
+  mysql-client-core-5.5 \
+  charm-helper-sh \
+  php-gettext \
+  php5 \
+  php5-cli
 
 a2enmod php5
 
@@ -51,7 +51,7 @@ chmod -R 777 tt-rss/lock
 
 # Create log directory for feed update daemon
 if [ ! -d /var/log/tt-rss ]; then
-	mkdir /var/log/tt-rss
+  mkdir /var/log/tt-rss
 fi
 chown -R www-data: /var/log/tt-rss
 

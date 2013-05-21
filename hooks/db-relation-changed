@@ -44,6 +44,10 @@ juju-log "Opening port 80"
 
 open-port 80
 
-juju-log "Starting tt-rss feed update daemon"
+juju-log "Stopping services"
 
-start tt-rss-daemon
+hooks/stop
+
+juju-log "Starting services"
+
+hooks/start
